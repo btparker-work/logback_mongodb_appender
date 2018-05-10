@@ -10,7 +10,7 @@
     <appender name="MONGODB" class="com.yanbo.logbackmongo.appenders.MongoAppender">
         <host>${mongoHost}</host>
         <port>${mongoPort}</port>
-        <database>${mongoDatabase}</database>
+        <databaseName>${mongoDatabase}</databaseName>
         <collectionName>${mongoCollection}</collectionName>
     </appender>
 

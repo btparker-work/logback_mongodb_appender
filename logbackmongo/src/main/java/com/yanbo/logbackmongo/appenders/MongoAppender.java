@@ -10,27 +10,27 @@ import org.bson.Document;
 
 import java.util.Date;
 
-
 /**
- * A logback appender for MongoDB
+ * A customized logback MongoDB appender
+ *
+ * @author Yanbo
  */
-
 public class MongoAppender extends UnsynchronizedAppenderBase<LoggingEvent> {
-    private MongoClient mongo;
+    private MongoClient mongoClient;
     private MongoCollection<Document> collection;
     private String host;
     private int port;
-    private String database;
+    private String databaseName;
     private String collectionName;
 
     @Override
     public void start() {
         try {
-            mongo = new MongoClient(host, port);
-            MongoDatabase db = mongo.getDatabase(database);
+            mongoClient = new MongoClient(host, port);
+            MongoDatabase db = mongoClient.getDatabase(databaseName);
             collection = db.getCollection(collectionName);
         } catch (Exception e) {
-            addStatus(new ErrorStatus("target MongoDB!", this, e));
+            addStatus(new ErrorStatus("Failed to connect to the targeted mongoDB. Please specify the right properties's names.", this, e));
             return;
         }
         super.start();
@@ -44,8 +44,8 @@ public class MongoAppender extends UnsynchronizedAppenderBase<LoggingEvent> {
         this.port = port;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setdatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public void setCollectionName(String collectionName) {
@@ -54,7 +54,7 @@ public class MongoAppender extends UnsynchronizedAppenderBase<LoggingEvent> {
 
     @Override
     public void stop() {
-        mongo.close();
+        mongoClient.close();
         super.stop();
     }
 
@@ -63,6 +63,7 @@ public class MongoAppender extends UnsynchronizedAppenderBase<LoggingEvent> {
         collection.insertOne(getDocument(event));
     }
 
+    // customize the document
     private Document getDocument(LoggingEvent event) {
         Document doc = new Document();
         // append the fields fetched from the event
